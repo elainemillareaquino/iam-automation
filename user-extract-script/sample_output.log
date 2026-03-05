@@ -1,0 +1,5 @@
+2026-03-04 22:24:09 [INFO] Script started.
+2026-03-04 22:24:09 [INFO] Executed by Administrator on DC
+2026-03-04 22:24:09 [INFO] Retrieving users from: OU=_USERS,DC=mydomain,DC=com
+2026-03-04 22:24:10 [INFO] Report successfully exported to C:\Users\Administrator\Documents\Output\sample_output.csv
+2026-03-04 22:24:10 [INFO] Script finished.

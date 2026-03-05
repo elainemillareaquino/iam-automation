@@ -32,18 +32,37 @@ param (
     [string]$OutputPath
 )
 
+# Create Log File
+$LogPath = [System.IO.Path]::ChangeExtension($OutputPath, ".log")
+
+function Write-Log {
+    param(
+        [string]$Message,
+        [string]$Level = "INFO"
+    )
+
+    $Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $LogEntry = "$Timestamp [$Level] $Message"
+
+    Add-Content -Path $LogPath -Value $LogEntry
+    Write-Host $LogEntry
+}
+
+Write-Log "Script started."
+Write-Log "Executed by $env:USERNAME on $env:COMPUTERNAME"
+
 # Import Active Directory module
 try {
     Import-Module ActiveDirectory -ErrorAction Stop
 }
 catch {
-    Write-Error "Active Directory module could not be loaded. Please ensure RSAT tools are installed."
+    Write-Log "Active Directory module could not be loaded. Please ensure RSAT tools are installed."
     exit
 }
 
 #Retrieve AD users
 try {
-    Write-Host "Retrieving users from: $SearchBase" -ForegroundColor Cyan
+    Write-Log "Retrieving users from: $SearchBase" -ForegroundColor Cyan
 
     $Users = Get-ADUser `
         -Filter * `
@@ -51,7 +70,7 @@ try {
         -Properties DisplayName, EmailAddress, Enabled, LastLogonDate, Department
 
     if (-not $Users) {
-        Write-Warning "No users found in the specified location."
+        Write-Log "No users found in the specified location."
         exit
     }
 
@@ -67,8 +86,10 @@ try {
     #Export to CSV
     $Report | Export-Csv -Path $OutputPath -NoTypeInformation
 
-    Write-Host "Report successfully exported to $OutputPath" -ForegroundColor Green
+    Write-Log "Report successfully exported to $OutputPath" -ForegroundColor Green
 }
 catch {
-    Write-Error "An error occured while retrieving users: $_"
+    Write-Log "An error occured while retrieving users: $_"
 }
+
+Write-Log "Script finished."
